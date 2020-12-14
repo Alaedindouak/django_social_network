@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{#{% block title %} {{ profile.user }} {% endblock title %}#}
+
+{% block content %}
+
+    <div class="ui modal">
+        <i class="close icon"></i>
+        <div class="header">
+          update your profile
+        </div>
+        <div class="image content">
+            <div class="ui medium image">
+              <img src="{{ profile.avatar.url }}">
+            </div>
+            <div class="description">
+               <div class="ui header">more information about you</div>
+               <form method="POST" class="ui form" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  {{ form.as_p }}
+                  <div class="actions">
+                     <button type="submit" class="ui positive right labeled icon button">
+                        update
+                        <i class="checkmark icon"></i>
+                     </button>
+                  </div>
+               </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="ui segment">
+{#        <h4>my profile: {{ request.user }}</h4>#}
+{#        <h4>my profile: {{ profile.user.username }}</h4>#}
+        <div class="ui grid">
+            <div class="row">
+                <div class="six wide column">
+                    <img class="ui medium rounded image" src="{{ profile.avatar.url }}" width="200" height="200">
+                    <div class="row mt-5 ml-5">
+                        <button class="ui teal basic button" id="model-btn">update your profile</button>
+                    </div>
+                </div>
+                <div class="ten wide column">
+                    <table class="ui table">
+                        <tbody>
+                            <tr>
+                                <td>username</td>
+                                <td>{{ profile.user }}</td>
+                            </tr>
+                             <tr>
+                                <td>full name</td>
+                                <td>{{ profile.first_name }} {{ profile.last_name }}</td>
+                            </tr>
+                             <tr>
+                                <td>bio</td>
+                                <td>{{ profile.bio }}</td>
+                            </tr>
+                            <tr>
+                                <td>friends</td>
+                                <td>{{ profile.get_friends_number }}</td>
+                            </tr>
+                            <tr>
+                                <td>posts</td>
+                                <td>{{ profile.get_posts_number }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+{% endblock content %}

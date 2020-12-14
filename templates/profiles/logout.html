@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %} LOGOUT {% endblock %}
+{% block content %}
+    <div class="ui message" style="top: 100px;">
+        <div class="header">Logout</div>
+        <div class="mt-5">
+            <p>Do you need to login again? <a href="{% url 'login-view' %}">&nbsp;login</a></p>
+        </div>
+    </div>
+{% endblock content %}

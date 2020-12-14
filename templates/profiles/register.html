@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %} REGISTRATION {% endblock title %}
+{% block content %}
+    <div class="ui segment" style="width: 50%; top: 50px;">
+        <form method="POST" class="ui form">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="ui green button">register</button>
+        </form>
+        <div class="mt-5">
+            <small>Already have an account? <a href="{% url 'login-view' %}">Sign in</a></small>
+        </div>
+    </div>
+{% endblock content %}
