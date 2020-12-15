@@ -1,11 +1,36 @@
 {% extends 'base.html' %}
-{% block title %}HOME{% endblock title %}
-
+{% block title %} {{ request.user.username.capitalize }} {% endblock title %}
 {% block content %}
-
-    <div class="ui grid">
-        <div class="eleven wide column">
-            {% for post in posts %}
+     <div class="ui grid mt-5">
+        <div class="six wide column">
+            <div class="ui segment">
+                <div class="">
+                    <img class="ui medium circular centered image" src="{{ profile.avatar.url }}">
+                </div>
+                <div class="ui segment">
+                    <div>
+                        <div class="ui grid">
+                            <div class="ten wide column">
+                                <strong>{{ profile.user.username }}</strong>
+                                <br>
+                                <small>{{ profile.created|timesince }} ago</small>
+                            </div>
+                            <div class="six wide column">
+                                <button class="ui positive basic button" id="model-btn">update</button>
+                            </div>
+                        </div>
+                        <p class="py-1 m-0">{{ profile.bio }}</p>
+                        <hr>
+                        <div class="ui grid">
+                            <div class="eight wide column"><strong> {{ profile.get_following_count }} &nbsp; following</strong></div>
+                            <div class="eight wide column"><strong>{{ profile.profile_posts_count }} &nbsp; posts</strong></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ten wide column">
+            {% for post in profile.profiles_posts %}
                 <div class="ui fluid card">
                     <div class="content">
                         <div class="right floated meta">
@@ -18,12 +43,11 @@
                                 </div>
                             </div>
                         </div>
-                        <img class="ui avatar image" src={{post.author.avatar.url}}>
-                        {{ post.author.user }} &nbsp;&#9656;&nbsp; <small>{{ post.created|timesince}}</small> ago
+                        <small>{{ post.created|timesince}}</small> ago
                     </div>
                     <div class="ui fluid image">
                         {% if post.image %}
-                            <img height="50" width="50" src={{post.image.url}}>
+                            <img src={{post.image.url}}>
                         {% endif %}
                     </div>
                     <div class="content">
@@ -32,7 +56,7 @@
                             <form action="{% url 'posts:like_post_view' %}" method="POST">
                                 {% csrf_token %}
                                 <input type="hidden" name="post_id" value={{post.id}}>
-                                {% if profile not in post.liked.all %}
+                                {% if request.user.profile not in post.liked.all %}
                                     <button type="submit" class="ui bwhite-sm button"><i class="thumbs up icon"></i>
                                     </button>
                                     <span> {{post.number_likes}} likes</span>
@@ -61,27 +85,39 @@
                             {% endif %}
                         </div>
 
-                        <form action="" method="POST" class='ui fluid form'>
-                            {% csrf_token %}
-                            <input type="hidden" name="post_comment_id" value={{post.id}}>
-                            {{ comment_form }}
-                            <button type="submit" name="submit_comment_form" class="ui primary button mt-5 w-full">Send</button>
-                        </form>
+{#                        <form action="" method="POST" class='ui fluid form'>#}
+{#                            {% csrf_token %}#}
+{#                            <input type="hidden" name="post_comment_id" value={{post.id}}>#}
+{#                            {{ comment_form }}#}
+{#                            <button type="submit" name="submit_comment_form" class="ui primary button mt-5 w-full">Send</button>#}
+{#                        </form>#}
                     </div>
                 </div>
             {% endfor %}
         </div>
-        <!-- POST FORM-->
-        <div class="five wide column">
-            <div class="ui segment">
-                {% if post_added %}
-                    <div class="ui green message" id="post_success_message">Post added</div>
-                {% endif %}
-                <form action="{% url 'posts:main-post-view' %}" method="POST" class='ui form' enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {{post_form}}
-                    <button type='submit' name="submit_post_form" class="ui positive button w-full mt-5">send</button>
-                </form>
+    </div>
+    <!--UPDATE MODAL-->
+    <div class="ui modal">
+        <i class="close icon"></i>
+        <div class="header">
+          update your profile
+        </div>
+        <div class="image content">
+            <div class="ui medium image">
+              <img src="{{ profile.avatar.url }}">
+            </div>
+            <div class="description">
+               <div class="ui header">more information about you</div>
+               <form method="POST" class="ui form" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  {{ form.as_p }}
+                  <div class="actions">
+                     <button type="submit" class="ui positive right labeled icon button">
+                        update
+                        <i class="checkmark icon"></i>
+                     </button>
+                  </div>
+               </form>
             </div>
         </div>
     </div>

@@ -8,7 +8,8 @@ from profiles.views import register
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', auth_views.LoginView.as_view(template_name='profiles/login.html'), name='login-view'),
+    path('', auth_views.LoginView.as_view(template_name='profiles/login.html', redirect_authenticated_user=True),
+         name='login-view'),
     path('logout/', auth_views.LogoutView.as_view(template_name='profiles/logout.html'), name='logout-view'),
     path('register/', register, name='register-view'),
     path('profile/', include('profiles.urls')),

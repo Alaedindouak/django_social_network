@@ -23,3 +23,7 @@ $(".comment_btn").click(function () {
         display=false
     }
 });
+
+$('#follow_btn').click(function(){
+    $('.ui.basic.modal').modal('show')
+});

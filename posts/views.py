@@ -6,13 +6,31 @@ from .models import Post, Like
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from itertools import chain
 
 
 @login_required
 def post_comment_create_and_list_view(request):
-	posts = Post.objects.all()
+	# posts = Post.objects.all()
 	# profile = Profile.objects.filter().filter()
 	profile = Profile.objects.get(user=request.user)
+
+	# check who we are following
+	users = [user for user in profile.following.all()]
+	posts = []
+	query = None
+	# get the posts of people who we are following
+	for user in users:
+		user_profile = Profile.objects.get(user=user)
+		user_post = user_profile.profiles_posts()
+		posts.append(user_post)
+	# get our posts
+	my_posts = profile.profiles_posts()
+	posts.append(my_posts)
+
+	if len(posts) > 0:
+		query = sorted(chain(*posts), reverse=True, key=lambda obj: obj.created)
+
 	post_form = PostModelForm()
 	comment_form = CommentModelForm()
 	if 'submit_post_form' in request.POST:
@@ -25,6 +43,8 @@ def post_comment_create_and_list_view(request):
 			post_form_instance.author = profile
 			post_form_instance.save()
 			post_form = PostModelForm()
+		return redirect(request.META.get('HTTP_REFERER'))
+
 
 	if 'submit_comment_form' in request.POST:
 		comment_form = CommentModelForm(request.POST)
@@ -34,9 +54,10 @@ def post_comment_create_and_list_view(request):
 			comment_form_instance.post = Post.objects.get(id=request.POST.get('post_comment_id'))
 			comment_form_instance.save()
 			comment_form = CommentModelForm()
+		return redirect(request.META.get('HTTP_REFERER'))
 
 	context = {
-		'posts': posts,
+		'posts': query,
 		'profile': profile,
 		'post_form': post_form,
 		'comment_form': comment_form,
@@ -44,14 +65,13 @@ def post_comment_create_and_list_view(request):
 
 	return render(request, 'posts/main.html', context)
 
-
+@login_required
 def like_unlike_post(request):
 	user = request.user
 	if request.method == 'POST':
 		post_id = request.POST.get('post_id')
 		post = Post.objects.get(id=post_id)
 		profile = Profile.objects.get(user=user)
-		# profile = Profile.objects.filter().first()
 
 		if profile in post.liked.all():
 			post.liked.remove(profile)
@@ -71,7 +91,7 @@ def like_unlike_post(request):
 			post.save()
 			like.save()
 
-	return  redirect('posts:main-post-view')
+	return redirect(request.META.get('HTTP_REFERER'))
 
 
 class PostDeleteView(DeleteView, LoginRequiredMixin):

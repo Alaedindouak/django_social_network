@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% block title%} detail {% endblock title %}
+{% block content %}
+    <div class="ui grid mt-5">
+        <div class="six wide column">
+            <div class="ui segment">
+                <div class="">
+                    <img class="ui medium circular centered image" src="{{ object.avatar.url }}">
+                </div>
+                <div class="ui segment">
+                    <div>
+                        <div class="ui grid">
+                            <div class="ten wide column">
+                                <strong>{{ object.user.username }}</strong>
+                                <br>
+                                <small>{{ object.user.profile.created|timesince }} ago</small>
+                            </div>
+                            <div class="six wide column">
+                                {% if follow %}
+                                    <form action="{% url 'profiles:follow-unfollow-view' %}" method="POST">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="profile_pk" value="{{ object.pk }}">
+                                        <button class="ui negative basic button" type="submit">unfollow</button>
+                                    </form>
+                                {% else %}
+                                    <form action="{% url 'profiles:follow-unfollow-view' %}" method="POST">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="profile_pk" value="{{ object.pk }}">
+                                        <button type="submit" class="ui positive basic button">follow</button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <p class="py-1 m-0">{{ object.user.profile.bio }}</p>
+                        <hr>
+                        <div class="ui grid">
+                            <div class="eight wide column"><strong> {{ object.get_following_count }} &nbsp; following</strong></div>
+                            <div class="eight wide column"><strong>{{ object.profile_posts_count }} &nbsp; posts</strong></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ten wide column">
+            {% for post in object.profiles_posts %}
+                <div class="ui fluid card">
+                    <div class="content">
+                        <small>{{ post.created|timesince}}</small> ago
+                    </div>
+                    <div class="ui fluid image">
+                        {% if post.image %}
+                            <img src={{post.image.url}}>
+                        {% endif %}
+                    </div>
+                    <div class="content">
+                        <p> {{ post.content }} </p>
+                        <div class="right floated">
+                            <form action="{% url 'posts:like_post_view' %}" method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="post_id" value={{post.id}}>
+                                {% if request.user.profile not in post.liked.all %}
+                                    <button type="submit" class="ui bwhite-sm button"><i class="thumbs up icon"></i>
+                                    </button>
+                                    <span> {{post.number_likes}} likes</span>
+                                {% else %}
+                                    <button type="submit" class="ui bwhite-sm button"><i class="thumbs down icon"></i>
+                                    </button>
+                                    <span> {{post.number_likes}} likes</span>
+                                {% endif %}
+                            </form>
+                        </div>
+                        <i class="comment icon"></i>
+                        <span> {{ post.number_comments }} comments</span>
+                    </div>
+                    <div class="extra content">
+                        <div class="mb-5"></div>
+                        <button class="comment_btn ui button mb-5">show / hide comments</button>
+                        <div class="comment-box">
+                            {% if post.comment_set.all %}
+                                {% for c in post.comment_set.all %}
+                                    <div class="ui segment mb-5">
+                                        <img class="ui avatar image" src={{c.user.avatar.url}}>
+                                        <span>{{ c.user }}</span>
+                                        <div class='mt-5'>{{ c.body }}</div>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+{#                        <form action="" method="POST" class='ui fluid form'>#}
+{#                            {% csrf_token %}#}
+{#                            <input type="hidden" name="post_comment_id" value={{post.id}}>#}
+{#                            {{ comment_form }}#}
+{#                            <button type="submit" name="submit_comment_form" class="ui primary button mt-5 w-full">Send</button>#}
+{#                        </form>#}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock content %}

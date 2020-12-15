@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %} USERS {% endblock title %}
+{% block content %}
+    <div class="ui grid mx-5 my-1">
+        {% for user in users %}
+            <div class="four wide column">
+                {% if user.user in request.user.profile.following.all %}
+                    <div class="ui red segment centered grid py-1">
+                        <a href="{% url 'profiles:user-profile-detail-view' user.pk %}">
+                            <img class="ui mini circular image column" src="{{ user.avatar.url }}">
+                        </a>
+                        <div class="ui right aligned grid my-2">
+                            <span class="username" style="padding-top: 7px;">{{ user.user.username.capitalize }}</span>
+                            <a class="ui basic button" href="{% url 'profiles:user-profile-detail-view' user.pk %}">
+                                see profile
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="ui green segment centered grid py-1">
+                        <a href="{% url 'profiles:user-profile-detail-view' user.pk %}">
+                            <img class="ui mini circular image column" src="{{ user.avatar.url }}">
+                        </a>
+                        <div class="ui right aligned grid my-2">
+                            <span class="username" style="padding-top: 7px;">{{ user.user.username.capitalize }}</span>
+                            <a class="ui basic button" href="{% url 'profiles:user-profile-detail-view' user.pk %}">
+                                see profile
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+{% endblock content %}
